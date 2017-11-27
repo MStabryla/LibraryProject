@@ -1,0 +1,215 @@
+﻿@model LibraryProject.Models.Essay
+
+@{
+    Layout = "~/Views/_Layout.cshtml";
+}
+@section scripts{
+    <script src="~/Scripts/my-script.js"></script>
+}
+<div class="block-12 main">
+    <p>
+        Proszę przygotować prezentacje według następujących zasad:
+        Sformułować tezę, którą należy poprzeć argumentami z:
+    </p>
+    <ul>
+        <li>5 książek</li>
+        <li>2 filmów</li>
+        <li>1 obrazu/plakatu/murala,itp.</li>
+    </ul>
+    <p>Argumenty mogą być zapisane skrótowo w formie dwóch, trzech zdań. Proszę pamiętać, że w trakcie przygotowań należy skorzystać z zasobów bibliotecznych ZSŁ (na karcie bibliotecznej ma zostać odnotowane wypożyczenie przynajmniej jednego egzemplarza)</p>
+</div>
+<h2>Nowa Rozprawka</h2>
+@using (Html.BeginForm("Add","Main",FormMethod.Post,new { id = "Form"}))
+{
+    @Html.AntiForgeryToken();
+    <div class="form-section">
+        <div class="sector">
+            <div class="form-section-header">Wstęp</div>
+            <div class="form-elem-ver">
+                <label>Temat rozprawki</label>
+                @Html.EditorFor(model => model.Question)
+            </div>
+
+            <div class="form-elem-ver">
+                <label>Teza</label>
+                <div class="desc"></div>
+                @Html.EditorFor(model => model.Side)
+            </div>
+            <div class="form-elem-ver"> 
+                <label>Autor</label>
+                <div class="desc">Wybierz z listy</div>
+                <select id="Autor_Id" >
+                    @foreach (Author aut in (List<Author>)ViewData["authors"])
+                    {
+                        <option value="@aut.Id">@aut.Name @aut.Surname</option>
+                    }
+                </select>
+            </div>
+        </div>
+        
+        <div class="sector">
+            <div class="form-section-header">Rozwinięcie - argumenty literackie</div>
+            <div class="block-12" id="Arg-Lit">
+
+            </div>
+            <button type="button" class="image-buttons"  id="But-Lit"><img src="~/Images/add.png" alt="err" /></button>
+        </div>
+        
+        <div class="sector">
+            <div class="form-section-header">Rozwinięcie - argumenty filmowe</div>
+            <div class="block-12" id="Arg-Fil">
+
+            </div>
+
+            <button type="button" class="image-buttons"  id="But-Fil"><img src="~/Images/add.png" alt="err" /></button>
+        </div>
+        <div class="sector">
+            <div class="form-section-header">Rozwinięcie - argumenty pozostałe (rzeźba, obraz itp. )</div>
+            <div class="block-12" id="Arg-Oth">
+
+            </div>
+            <button type="button" class="image-buttons" id="But-Oth"><img src="~/Images/add.png" alt="err" /></button>
+        </div>
+        
+        <div class="form-elem-ver">
+            <label>Źródła użyte z zasobów bibliotecznych</label>
+            <div class="desc">Wszystkie ksiązki, które wypożyczyłeś z biblioteki do stworzenia tej rozprawki ( pamiętaj, by na karcie bibliotecznej zostało to odnotowane )</div>
+            @Html.EditorFor(model => model.LibraryResource)
+            @Html.ValidationMessageFor(model => model.LibraryResource, "")
+        </div>
+        
+        <div class="form-group">
+            <input type="submit" value="Utwórz" class="form-submit" id="Submit"/>
+        </div>
+    </div>
+}
+<div class="alert" id="Alert">
+
+</div>
+<script>
+    window.onload = function () {
+        var pars = new DOMParser();
+        document.getElementById("But-Lit").addEventListener("click", function () {
+            GetArgument(1, function (dat) {
+                var nelem = pars.parseFromString(dat,"text/html");
+                //document.getElementById("Arg-Fil").innerHTML += dat;
+                document.getElementById("Arg-Lit").appendChild(nelem.firstChild);
+                Init()
+            });
+        })
+        document.getElementById("But-Fil").addEventListener("click", function () {
+            GetArgument(2, function (dat) {
+                var nelem = pars.parseFromString(dat, "text/html");
+                //document.getElementById("Arg-Fil").innerHTML += dat;
+                document.getElementById("Arg-Fil").appendChild(nelem.firstChild);
+                Init()
+            });
+        })
+        document.getElementById("But-Oth").addEventListener("click", function () {
+            GetArgument(3, function (dat) {
+                var nelem = pars.parseFromString(dat, "text/html");
+                //document.getElementById("Arg-Fil").innerHTML += dat;
+                document.getElementById("Arg-Oth").appendChild(nelem.firstChild);
+                Init()
+            });
+        })
+    }
+    $("#Submit").on("click", function (e) {
+        e.preventDefault();
+        var listOfA = $(".argument");
+        var objl = [];
+        for (var i = 0; i < listOfA.length; i++)
+        {
+            var obj = { content: "", source: "", type: "" };
+            obj.content = listOfA[i].children[0].children[1].value;
+            obj.source = listOfA[i].children[1].children[2].value;
+            obj.type = listOfA[i].children[2].value;
+            objl.push(obj);
+            
+        }
+        var str = StringArgument(objl);
+        var formData = {
+            Question: $("#Question").val(),
+            Side: $("#Side").val(),
+            Autor_Id: $("#Autor_Id").val(),
+            ConString: str.ConString,
+            SouString: str.SouString,
+            TypeString: str.TypeString,
+            LibraryResource: $("#LibraryResource").val(),
+            __RequestVerificationToken: $("input")[0].value
+        };
+        var resp = Validate(objl,formData);
+        if (resp.comp)
+        {
+            $("#Alert").empty();
+            var img = document.createElement("img");
+            img.setAttribute("src", "Images/load.gif");
+            var lab = document.createElement("label");
+            lab.setAttribute("id", "AjaxF");
+            lab.innerHTML = "Wysyłanie";
+            $("#Alert").append(img)
+                .append(lab);
+            $("#Alert").css("background-color", "yellow");
+            AlertLaugth();
+            $.ajax({
+                url:"@Url.Action("Add","Main")",
+                method: "POST",
+                dataType: "text",
+                data: formData,
+                success: function (data) {
+                    var dat = JSON.parse(data);
+                    dat.err = eval(dat.err);
+                    if (dat.Completed)
+                    {
+                        $("#Alert").css("background-color", "green");
+                        $("#Ajaxf").text("Wykonano");
+                    }
+                    else
+                    {
+                        console.log(data,dat);
+                        $("#Alert").css("background-color", "red")
+                            .empty();
+                        for (var i = 0; i < dat.err.length; i++)
+                        {
+                            var errem = document.createElement("span");
+                            errem.innerText = dat.err[i];
+                            $("#Alert").append(errem);
+                        }
+                    }
+                },
+                error: function () {
+
+                }
+            })
+        }
+        else
+        {
+            $("#Alert").empty();
+            $("#Alert").css("background-color", "red");
+            for (var i = 0; i < resp.res.length; i++)
+            {
+                var el = document.createElement("span");
+                el.innerText = resp.res[i];
+                $("#Alert").append(el);
+            }
+            AlertLaugth();
+        }
+    })
+    function AlertLaugth() {
+        $("#Alert").fadeIn(1000, function () {
+            $("#Alert").css("display", "block");
+            $("#Alert").on("click", function () {
+                $(this).fadeOut(1000, function () {
+                    $(this).css("display", "none");
+                })
+            })
+        });
+    }
+    function FillAll()
+    {
+        $("textarea,input[type=text]").each(function (index,elem) {
+            $(elem).val("Lorem Ipsum");
+            console.log($(elem));
+        });
+    }
+</script>

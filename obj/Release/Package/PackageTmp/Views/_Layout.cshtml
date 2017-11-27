@@ -1,0 +1,20 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <meta charset="utf-8" />
+    <title>Projekt biblioteczny</title>
+    <link href="~/css/Zero.css" rel="stylesheet" type="text/css" />
+    <link href="~/css/GridSheet.css" rel="stylesheet" type="text/css" />
+    <link href="~/css/Main.css" rel="stylesheet" type="text/css"/>
+    @RenderSection("scripts",false)
+    <script src="~/Scripts/jquery-3.1.1.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.bootstrap.min.js"></script>
+</head>
+<body>
+    <section class="container" >
+        <h1 class="block-12 header">Projekt biblioteczny - opracowania matur ustnych</h1>
+        @RenderBody()
+    </section>
+</body>
+</html>

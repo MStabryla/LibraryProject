@@ -1,0 +1,21 @@
+﻿@model LibraryProject.Models.Essay
+
+@{
+    Layout = "~/Views/_Layout.cshtml";
+}
+
+<div class="essay block-12">
+    <h2>@Model.Question</h2>
+    <span class="author">@Model.Author.Name @Model.Author.Surname</span>
+    <h3>@Model.Side</h3>
+    <div class="arguments">
+        @foreach(Argument arg in Model.Arguments)
+        {
+            <div class="@(arg.Kind == 1 ? "show-argument-lit"  : (arg.Kind == 2 ? "show-argument-fil" : "show-argument-oth"))">
+                <h4> @arg.Source</h4>
+                <p>@arg.Content</p>
+            </div>
+        }
+    </div>
+    <span class="lib-source">Zasób biblioteczny : @Model.LibraryResource</span>
+</div>

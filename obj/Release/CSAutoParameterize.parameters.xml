@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <parameter name="MainCon-Web.config Connection String" description="MainCon Parametry połączenia używane w pliku web.config przez aplikację w celu uzyskiwania dostępu do bazy danych." defaultValue="Data Source=stabryla.database.windows.net;Initial Catalog=stabryla;Persist Security Info=True;User ID=Morteniusz23;Password=Kalharra23" tags="SqlConnectionString">
+    <parameterEntry kind="XmlFile" scope="C:\\Users\\maatt\\OneDrive\\PROGRAMOWANIE\\C\#\\MVC\\LibraryProject\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='MainCon']/@connectionString" />
+  </parameter>
+</parameters>

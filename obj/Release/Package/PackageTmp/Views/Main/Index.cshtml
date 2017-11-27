@@ -1,0 +1,85 @@
+﻿@model IEnumerable<LibraryProject.Models.Essay>
+
+@{
+    Layout = "~/Views/_Layout.cshtml";
+}
+<div class="block-12 search">
+    <div class="form">
+        <div class="form-elem-hor">
+            <label>Znajdź</label>
+            <input type="text" id="Search" />
+        </div>
+    </div>
+    <script>
+        var temlength = @Model.Count();
+        $("#Search").on("input", function () {
+            var query = $(this).val();
+            if (query != "") {
+                $("#Loading").css("display", "block");
+                $.ajax({
+                    method: "POST",
+                    type: "json",
+                    data: {
+                        query: query
+                    },
+                    url: "@Url.Action("Find","Main")",
+                    success: function (data) {
+                        var List = data.list;
+                        $("#List-Essay").empty();
+                        for (var i = 0; i < List.length; i++) {
+                            var elem = document.createElement("div");
+                            var str = "<div class='block-12 min-essay'> <span class='min-title'> " + List[i].Question + " </span > <span class='min-author'>" + List[i].Author.Name + " " + List[i].Author.Surname + "</span> <span class='min-quest'>Na podstawie " + List[i].LibraryRes + " </span><div><span class='min-show'><a href='rozprawka/" + List[i].Id + " '>Zobacz</a></span></div></div>";
+                            elem.innerHTML = str;
+                            $("#List-Essay").append($(elem));
+                        }
+                        $("#Loading").css("display", "none");
+                    }
+                });
+            }
+            else
+            {
+                $("#Loading").css("display", "block");
+                $.ajax({
+                    method: "POST",
+                    type: "json",
+                    url: "@Url.Action("FindAll","Main")",
+                    success: function (data) {
+                        var List = data.list;
+                        $("#List-Essay").empty();
+                        for (var i = 0; i < List.length; i++) {
+                            var elem = document.createElement("div");
+                            var str = "<div class='block-12 min-essay'> <span class='min-title' >" + List[i].Question +  " </span > <span class='min-author'>" + List[i].Author.Name + " " + List[i].Author.Surname + "</span><span class='min-quest'>Na podstawie " + List[i].LibraryRes + " </span><div><span class='min-show'><a href='rozprawka/"  +  List[i].Id + " '>Zobacz</a></span></div></div>";
+                            elem.innerHTML = str;
+                            $("#List-Essay").append($(elem));
+                        }
+                        $("#Loading").css("display", "none");
+
+                    }
+                });
+            }
+        });
+    </script>
+</div>
+<h2 class="block-12">
+    Lista wszystkich wysłanych aktualnie rozprawek: 
+</h2>
+<div class="block-12" id="Loading" style="display:none;">
+    <img src="~/Images/load.gif"  alt="err" style="display:block;margin:0 auto;"/>
+</div>
+<div class="list-essay" id="List-Essay">
+    @foreach (LibraryProject.Models.Essay r in Model)
+    {
+        <div class="block-12 min-essay">
+            <span class="min-title">@r.Question</span>
+            <span class="min-author">@r.Author.Name  @r.Author.Surname</span>
+            <span class="min-quest">Na podstawie @r.LibraryResource</span>
+            <div>
+                <span class="min-show"><a href="@Url.Action("Essay","Main",new { id = r.Id })">Zobacz</a></span>
+            </div>
+
+        </div>
+    }
+</div>
+<div>
+    <a class="add-essay" href="@Url.Action("Add","Main")">Dodaj rozprawkę</a>
+</div>

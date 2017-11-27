@@ -1,0 +1,32 @@
+﻿@model LibraryProject.Models.Argument
+
+@using (Html.BeginForm("Main", "Argument", FormMethod.Post))
+{
+    string koa = (KindOfArgument)ViewBag.arg == KindOfArgument.Lit ? "argument-lit" : (KindOfArgument)ViewBag.arg == KindOfArgument.Fil ? "argument-fil" : "argument-oth";
+    <div class="form-section argument @koa">
+        <div class="form-elem-ver">
+            <label>Treść</label>
+            @Html.TextAreaFor(x => x.Content,new { @class="argument-content"})
+        </div>
+        <div class="form-elem-ver">
+            <label>Żródło</label>
+            <div class="desc">
+                @switch((KindOfArgument)ViewBag.arg)
+                {
+                    case KindOfArgument.Lit:
+                        <text>Nazwa ksiązki oraz jej autor</text>
+                        break;
+                    case KindOfArgument.Fil:
+                        <text>Tytuł filmu oraz jego reżyser</text>
+                        break;
+                    case KindOfArgument.Oth:
+                        <text>Nazwa dzieła i jego autor oraz rodzaj dzieła (rzeźba, obraz itp. )</text>
+                        break;
+                }
+            </div>
+            @Html.EditorFor(x => x.Source, new { @class = "argument-source" })
+        </div>
+        <input type="hidden" name="Kind" value="@ViewBag.arg" />
+        <button type="button" class="rem" onclick="this.parentElement.remove();">X</button>
+    </div>
+}
