@@ -35,7 +35,8 @@ namespace LibraryProject.Controllers
         [Route("dodaj")]
         public ActionResult Add()
         {
-            ViewData.Add("authors", TemDatabase.Autors.AsNoTracking().ToList());
+            var TempDatabase = TemDatabase;
+            ViewData.Add("authors", TempDatabase.Autors.AsNoTracking().ToList());
             return View();
         }
         [HttpPost]
@@ -237,6 +238,48 @@ namespace LibraryProject.Controllers
         {
             ViewBag.arg = (KindOfArgument)type;
             return PartialView();
+        }
+        [HttpGet]
+        [Route("edytuj/{id}")]
+        public ActionResult Edit(int id)
+        {
+            return View(TemDatabase.Essays.First(x => x.Id == id));
+        }
+        [HttpPost]
+        [Route("edytuj/{id}")]
+        public async Task<ActionResult> Edit(int id,EditView model)
+        {
+            var TempDatabase = TemDatabase;
+            Essay obj = TempDatabase.Essays.Include(x => x.Author).First(x => x.Id == id);
+            if(obj == null)
+            {
+                return Json(new { Completed = false , err = new string[] { "Nie znaleziono rozprawki" } });
+            }
+            obj.LibraryResource = model.LibraryResource;
+            TempDatabase.Entry(obj).State = EntityState.Modified;
+            try
+            {
+                int f = await TempDatabase.SaveChangesAsync();
+                if (f >= 0)
+                {
+                    return Json(
+                        new
+                        {
+                            Completed = true
+                        }
+                    );
+                }
+                else
+                {
+                    return Json(new { Completed = false, err = new string[] { "Błąd zapisu danych" } });
+                }
+            }
+            catch(Exception ex)
+            {
+                return Json(new { Completed = false, err = new string[] { ex.Message } });
+            }
+
+            
         }
         private List<string> Validation(ArgumentView model)
         {

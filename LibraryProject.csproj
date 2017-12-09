@@ -137,6 +137,7 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Models.cs" />
     <Compile Include="Models\ViewModels\ArgumentView.cs" />
+    <Compile Include="Models\ViewModels\EditView.cs" />
     <Compile Include="Models\_Models.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -152,6 +153,7 @@
     <Content Include="Views\Shared\Argument.cshtml" />
     <Content Include="Views\Main\Essay.cshtml" />
     <None Include="Properties\PublishProfiles\bibliotekazsl - Web Deploy.pubxml" />
+    <Content Include="Views\Main\Edit.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

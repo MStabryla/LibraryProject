@@ -63,6 +63,9 @@
 <h2 class="block-12">
     Lista wszystkich wysłanych aktualnie rozprawek: 
 </h2>
+<div>
+    <a class="add-essay" href="@Url.Action("Add","Main")">Dodaj rozprawkę</a>
+</div>
 <div class="block-12" id="Loading" style="display:none;">
     <img src="~/Images/load.gif"  alt="err" style="display:block;margin:0 auto;"/>
 </div>
@@ -75,11 +78,9 @@
             <span class="min-quest">Na podstawie @r.LibraryResource</span>
             <div>
                 <span class="min-show"><a href="@Url.Action("Essay","Main",new { id = r.Id })">Zobacz</a></span>
+                <span class="min-show"><a href="@Url.Action("Edit","Main",new { id = r.Id })">Edytuj</a></span>
             </div>
 
         </div>
     }
-</div>
-<div>
-    <a class="add-essay" href="@Url.Action("Add","Main")">Dodaj rozprawkę</a>
 </div>

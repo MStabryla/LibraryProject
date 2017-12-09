@@ -40,7 +40,7 @@ function Validate(argList,obj) {
         return elem.type == "Oth";
     })
     if (o.length <= 0) {
-        resp.push(" Brakujące argumenty literackie - brakuje jakiegokolwiek");
+        resp.push(" Brakujące argumenty pozostałe - brakuje jakiegokolwiek");
     }
     for (var i = 0; i < argList.length; i++) {
         var elem = argList[i];

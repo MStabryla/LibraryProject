@@ -1,0 +1,88 @@
+﻿@model LibraryProject.Models.Essay
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/_Layout.cshtml";
+}
+<h2>Edytuj rozprawkę</h2>
+<div class="block-12">
+    <div class="block-12">
+        <h3>@Model.Question</h3>
+    </div>
+    <form method="post" class="form">
+        <div class="form-elem-ver">
+            <label>Zasób biblioteczny</label>
+            @Html.EditorFor(x => x.LibraryResource)
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Edytuj" class="form-submit" id="Submit" />
+        </div>
+    </form>
+    <div>
+        @Html.ActionLink("Wróć","Index")
+    </div>
+</div>
+<div class="alert" id="Alert">
+
+</div>
+<script>
+    $("#Submit").on("click", function (e) {
+        e.preventDefault();
+        $("#Alert").empty();
+        var img = document.createElement("img");
+        img.setAttribute("src", "/Images/load.gif");
+        var lab = document.createElement("label");
+        lab.setAttribute("id", "AjaxF");
+        lab.innerHTML = "Wysyłanie";
+        $("#Alert").append(img)
+            .append(lab);
+        AlertLaugth();
+        var formData = {
+            LibraryResource: $("#LibraryResource").val()
+        }
+        console.log("formData", formData);
+         $.ajax({
+                url:"@Url.Action("Edit","Main",new { id=Model.Id})",
+                method: "POST",
+                dataType: "text",
+                data: formData,
+                success: function (data) {
+                    var dat = JSON.parse(data);
+                    dat.err = eval(dat.err);
+                    if (dat.Completed)
+                    {
+                        $("#Alert").css("background-color", "green");
+                        $(lab).text("Wykonano");
+                        $(img).css("display", "none");
+                        $("#Alert").fadeOut(3000, function () {
+                            $(this).css("display", "none");
+                        })
+                    }
+                    else
+                    {
+                        console.log(data,dat);
+                        $("#Alert").css("background-color", "red")
+                            .empty();
+                        for (var i = 0; i < dat.err.length; i++)
+                        {
+                            var errem = document.createElement("span");
+                            errem.innerText = dat.err[i];
+                            $("#Alert").append(errem);
+                        }
+                    }
+                },
+                error: function () {
+
+                }
+            })
+    })
+    function AlertLaugth() {
+        $("#Alert").fadeIn(1000, function () {
+            $("#Alert").css("display", "block");
+            $("#Alert").on("click", function () {
+                $(this).fadeOut(1000, function () {
+                    $(this).css("display", "none");
+                })
+            })
+        });
+    }
+</script>
